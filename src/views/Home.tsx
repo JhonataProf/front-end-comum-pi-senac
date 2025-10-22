@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
-import TabelaJS from '../components/TabelaJS';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import TabelaJS from '../components/TabelaJS';
+import api from '../http/api';
 
 interface Prato {
   id: number;
@@ -11,33 +12,21 @@ interface Prato {
 }
 
 export default function Home() {
-  const [pratos, setPratos] = useState<Prato[]>([
-    {
-      id: 1,
-      nome: 'Feijoada',
-      cozinha: 'Brasileira',
-      descricaoCurta: 'Feijoada completa com sabor inigualável.',
-      valor: 28.0,
-    },
-    {
-      id: 2,
-      nome: 'Moqueca',
-      cozinha: 'Brasileira',
-      descricaoCurta: 'Moqueca de peixe com leite de coco.',
-      valor: 35.0,
-    },
-    {
-      id: 3,
-      nome: 'Churrasco',
-      cozinha: 'Brasileira',
-      descricaoCurta: 'Churrasco com cortes nobres e acompanhamentos.',
-      valor: 50.0,
-    },
-  ]);
+  useEffect(() => {
+    // Simula a obtenção de dados de pratos
+    const fetchPratos = async () => {
+      // Aqui você pode substituir por uma chamada real à API
+      const response = await api.get('/pratos');
+
+      setPratos(response.data);
+    };
+    fetchPratos();
+  }, []);
+  const [pratos, setPratos] = useState<Prato[]>([]);
   const navigate = useNavigate();
 
   const handleEdit = (prato: Prato) => {
-    navigate(`/admin/editar-prato/${prato.id}`);
+    navigate(`/admin/detalhes-prato/${prato.id}`);
   };
 
   const handleDelete = (prato: Prato) => {

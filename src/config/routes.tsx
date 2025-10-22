@@ -10,6 +10,8 @@ import ShoppingCart from '../components/ShoppingCart';
 import HomeCliente from '../components/HomeCliente';
 import DetalhesPrato from '../components/DetalhesPrato';
 import FormularioPrato from '../components/FormularioPrato';
+import { AuthProvider } from '../context/authContext';
+import { CartProvider } from '../context/cartContext';
 
 export interface RouteConfig {
   path: string;
@@ -24,15 +26,27 @@ const routes: RouteConfig[] = [
   },
   {
     path: 'cardapio',
-    element: <HomeCliente />,
+    element: (
+      <CartProvider>
+        <HomeCliente />
+      </CartProvider>
+    ),
   },
   {
     path: '/detalhes/:id',
-    element: <DetalhesPrato />,
+    element: (
+      <CartProvider>
+        <DetalhesPrato />
+      </CartProvider>
+    ),
   },
   {
     path: '/carrinho',
-    element: <ShoppingCart />,
+    element: (
+      <CartProvider>
+        <ShoppingCart />
+      </CartProvider>
+    ),
   },
   {
     path: '/',
@@ -40,7 +54,11 @@ const routes: RouteConfig[] = [
     children: [
       {
         path: 'admin',
-        element: <RestrictedLayout />,
+        element: (
+          <AuthProvider>
+            <RestrictedLayout />
+          </AuthProvider>
+        ),
         children: [
           {
             path: '',
@@ -59,15 +77,15 @@ const routes: RouteConfig[] = [
             element: <Home />,
           },
           {
-            path: 'users',
+            path: 'usuarios',
             element: <UserManagement />,
           },
           {
-            path: 'users/new',
+            path: 'usuarios/novo',
             element: <UserForm />,
           },
           {
-            path: 'users/edit/:id',
+            path: 'usuarios/editar/:id',
             element: <UserForm isEditing />,
           },
         ],

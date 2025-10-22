@@ -1,4 +1,6 @@
-import React, { useState } from 'react';
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import React, { useContext, useState } from 'react';
+import { CartContext } from '../context/cartContext';
 
 interface Dish {
   id: number;
@@ -34,6 +36,18 @@ const ShoppingCart: React.FC = () => {
     console.log('Pedido confirmado:', { dishes, address, paymentInfo });
     alert('Pedido confirmado!');
   };
+
+  const cartContext = useContext(CartContext);
+
+  if (!cartContext) {
+    throw new Error('CartContext não está disponível');
+  }
+
+  const {
+    pratos: pratosNoCarrinho,
+    adicionarPrato,
+    removerPrato,
+  } = cartContext;
 
   return (
     <div className="flex flex-col lg:flex-row gap-6 p-6">

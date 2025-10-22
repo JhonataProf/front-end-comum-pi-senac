@@ -1,6 +1,8 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import React from 'react';
 import '../estilos/Home.css';
 import CardPrato from './CardPrato';
+import { CartContext } from '../context/cartContext';
 
 function HomeCliente() {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -54,6 +56,18 @@ function HomeCliente() {
         'https://media.istockphoto.com/id/1171234567/pt/foto/brigadeiro.jpg?s=2048x2048&w=is&k=20&c=Z5Qv8vQ9X9z9J9Z9J9z9J9Z9J9z9J9Z9J9z9J9Z9J9z9=',
     },
   ]);
+
+  const cartContext = React.useContext(CartContext);
+
+  if (!cartContext) {
+    throw new Error('CartContext não está disponível');
+  }
+
+  const {
+    pratos: pratosNoCarrinho,
+    adicionarPrato,
+    removerPrato,
+  } = cartContext;
 
   return (
     <div className="min-h-screen bg-gray-100 p-6">

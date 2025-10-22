@@ -1,23 +1,42 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
+import {
+  FiDisc,
+  FiHome,
+  FiLogOut,
+  FiMenu,
+  FiUser,
+  FiUsers,
+} from 'react-icons/fi';
 import { Outlet } from 'react-router-dom';
-import { FiMenu, FiHome, FiSettings, FiLogOut, FiUser } from 'react-icons/fi';
+import { AuthContext } from '../context/authContext';
+
+export interface MenuItem {
+  path: string;
+  label: string;
+  icon: React.ReactNode;
+}
 
 const RestrictedLayout: React.FC = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(false);
+
+  const authContext = useContext(AuthContext);
+
+  if (!authContext) {
+    throw new Error('AuthContext não está disponível');
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { usuario, verificarLogin } = authContext;
 
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
   };
 
-  const user = {
-    name: 'João Silva',
-    email: 'joao.silva@email.com',
-  };
-
-  const menuItems = [
-    { path: '/home', label: 'Home', icon: <FiHome /> },
-    { path: '/settings', label: 'Configurações', icon: <FiSettings /> },
-    { path: '/logout', label: 'Logout', icon: <FiLogOut /> },
+  const menuItems: MenuItem[] = [
+    { path: '/admin/home', label: 'Home', icon: <FiHome /> },
+    { path: '/admin/logout', label: 'Logout', icon: <FiLogOut /> },
+    { path: '/admin/novo-prato', label: 'Novo Prato', icon: <FiDisc /> },
+    { path: '/admin/usuarios', label: 'Usuários', icon: <FiUsers /> },
   ];
 
   return (
@@ -76,8 +95,8 @@ const RestrictedLayout: React.FC = () => {
             </button>
             <div className="absolute right-0 mt-2 bg-white shadow-lg rounded-lg w-40 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
               <div className="p-4 border-b">
-                <p className="text-sm font-bold">{user.name}</p>
-                <p className="text-sm text-gray-500">{user.email}</p>
+                <p className="text-sm font-bold">{usuario?.email}</p>
+                <p className="text-sm text-gray-500">{usuario?.role}</p>
               </div>
               <a
                 href="/user/details"
