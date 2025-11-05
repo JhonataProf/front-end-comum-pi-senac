@@ -2,13 +2,30 @@ import React from 'react';
 
 interface TBodyJSProps<T> {
   data: T[]; // Dados genéricos
-  columns: (keyof T | 'Ações')[]; // Colunas baseadas nas chaves do objeto genérico T
+  columns: (keyof T | 'Ações')[];
   actions?: {
-    [key: string]: (item: T) => void; // Ações que recebem o objeto completo
+    [key: string]: (item: T) => void;
   };
 }
 
 const TBodyJS = <T,>({ data, columns, actions }: TBodyJSProps<T>) => {
+  // ✅ Garante que 'data' seja um array antes de usar .map()
+  if (!Array.isArray(data)) {
+    console.error('⚠️ TBodyJS recebeu "data" inválido:', data);
+    return (
+      <tbody>
+        <tr>
+          <td
+            colSpan={columns.length}
+            className="text-center p-4 text-gray-500"
+          >
+            Nenhum dado disponível
+          </td>
+        </tr>
+      </tbody>
+    );
+  }
+
   return (
     <tbody>
       {data.map((row, rowIndex) => (

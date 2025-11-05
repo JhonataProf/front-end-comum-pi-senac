@@ -12,6 +12,8 @@ import DetalhesPrato from '../components/DetalhesPrato';
 import FormularioPrato from '../components/FormularioPrato';
 import { AuthProvider } from '../context/authContext';
 import { CartProvider } from '../context/cartContext';
+import PedidoManagement from '../views/PedidoManagement';
+import FormularioPedido from '../components/FormularioPedido';
 
 export interface RouteConfig {
   path: string;
@@ -69,6 +71,14 @@ const routes: RouteConfig[] = [
             element: <FormularioPrato />,
           },
           {
+            path: 'novo-pedido',
+            element: <FormularioPedido />,
+          },
+          {
+            path: 'novo-pedido',
+            element: <FormularioPedido isEditing />,
+          },
+          {
             path: 'detalhes-prato/:id',
             element: <FormularioPrato isEditing />,
           },
@@ -87,6 +97,10 @@ const routes: RouteConfig[] = [
           {
             path: 'usuarios/editar/:id',
             element: <UserForm isEditing />,
+          },
+          {
+            path: 'pedidos',
+            element: <PedidoManagement />,
           },
         ],
       },

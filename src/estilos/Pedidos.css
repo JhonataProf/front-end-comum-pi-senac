@@ -1,0 +1,55 @@
+.excel-container {
+  padding: 20px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.excel-table {
+  border-width: 1px; /* equivalente a border */
+  border-style: solid; /* borda sólida padrão */
+  border-color: #d1d5db; /* equivalente a border-gray-300 */
+  padding: 8px; /* equivalente a p-2 (8px) */
+}
+
+.excel-table th,
+.excel-table td {
+  border: 1px solid #ccc;
+  padding: 8px;
+  text-align: left;
+}
+
+.excel-table th {
+  background-color: #eaf0f6;
+  font-weight: bold;
+}
+
+.excel-table tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+/* Estilo para status */
+.status {
+  font-weight: bold;
+  text-align: center;
+  border-radius: 4px;
+  padding: 4px;
+}
+
+.status.ok {
+  background-color: #c6f6d5;
+  color: #276749;
+}
+
+.status.prep {
+  background-color: #fefcbf;
+  color: #744210;
+}
+
+.status.pendente {
+  background-color: #fed7d7;
+  color: #742a2a;
+}

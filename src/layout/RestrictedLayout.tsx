@@ -35,8 +35,10 @@ const RestrictedLayout: React.FC = () => {
   const menuItems: MenuItem[] = [
     { path: '/admin/home', label: 'Home', icon: <FiHome /> },
     { path: '/admin/logout', label: 'Logout', icon: <FiLogOut /> },
+    { path: '/admin/novo-pedido', label: 'Novo Pedido', icon: <FiUser /> },
     { path: '/admin/novo-prato', label: 'Novo Prato', icon: <FiDisc /> },
     { path: '/admin/usuarios', label: 'Usuários', icon: <FiUsers /> },
+    { path: '/admin/pedidos', label: 'Pedidos', icon: <FiUser /> },
   ];
 
   return (

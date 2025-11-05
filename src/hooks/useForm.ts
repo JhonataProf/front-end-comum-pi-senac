@@ -8,6 +8,7 @@ const useForm = <T extends Record<string, unknown>>(initialValues: T) => {
     (field: keyof T) =>
     (
       e:
+        | React.ChangeEvent<HTMLSelectElement>
         | React.ChangeEvent<HTMLInputElement>
         | React.ChangeEvent<HTMLTextAreaElement>,
     ) => {
