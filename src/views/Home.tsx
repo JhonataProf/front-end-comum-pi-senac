@@ -13,11 +13,8 @@ interface Prato {
 
 export default function Home() {
   useEffect(() => {
-    // Simula a obtenção de dados de pratos
     const fetchPratos = async () => {
-      // Aqui você pode substituir por uma chamada real à API
       const response = await api.get('/pratos');
-
       setPratos(response.data);
     };
     fetchPratos();
@@ -29,14 +26,18 @@ export default function Home() {
     navigate(`/admin/detalhes-prato/${prato.id}`);
   };
 
-  const handleDelete = (prato: Prato) => {
-    console.log(`Deletar prato com ID: ${prato.id}`);
-    setPratos((prevPratos) => prevPratos.filter((p) => p.id !== prato.id));
+  const handleDelete = async (prato: Prato) => {
+    try {
+      const response = await api.delete(`/pratos/${prato.id}`);
+      console.log('Prato deletado com sucesso:', response.data);
+      setPratos((prevPratos) => prevPratos.filter((p) => p.id !== prato.id));
+    } catch (error) {
+      console.error('Erro ao deletar o prato:', error);
+    }
   };
 
   const handleView = (prato: Prato) => {
     navigate(`/admin/detalhes-prato/${prato.id}`);
-    console.log(`Visualizar prato com ID: ${prato.id}`);
   };
 
   const columns: (keyof Prato | 'Ações')[] = [

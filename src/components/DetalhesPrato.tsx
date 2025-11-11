@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { useIsMounted } from '../hooks/useIsMounted';
+import api from '../http/api';
 // import api from '../http/api';
 
 interface Prato {
@@ -11,38 +13,20 @@ interface Prato {
   valor: number;
 }
 
-const prato = {
-  nome: 'Feijoada',
-  cozinha: 'Brasileira',
-  valor: 28.0,
-  descricao:
-    'Sinta o sabor inigualável de nossa feijoada, preparada com ingredientes selecionados e tempero único que te leva à sensação de estar desfrutando dessa experiência gastronômica em uma fazenda lá no interior.',
-  imagem:
-    'https://media.istockphoto.com/id/899497396/pt/foto/delicious-brazilian-feijoada.jpg?s=2048x2048&w=is&k=20&c=OO_JGRT2AgsybJxSFB-mFP2vsOn7QtsbqEd1sZiUzuw=',
-};
-
-function fetchPratoDetails(id: string): Promise<Prato> {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve({
-        ...prato,
-        id: Number(id),
-        descricaoDetalhada: prato.descricao,
-      });
-    }, 1000);
-  });
-}
-
 const DetalhesPrato: React.FC = () => {
+  const isMounted = useIsMounted();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [prato, setPrato] = useState<Prato | null>(null);
 
+  async function fetchPratoDetails(id: string): Promise<Prato> {
+    const response = await api.get<Prato>(`/pratos/${id}`);
+    return response.data;
+  }
+
   useEffect(() => {
     const fetchPrato = async () => {
       try {
-        // const response = await api.get<Prato>(`/pratos/${id}`);
-        // setPrato(response.data);
         const response = await fetchPratoDetails(id!);
         setPrato(response);
       } catch (error) {
@@ -50,10 +34,10 @@ const DetalhesPrato: React.FC = () => {
       }
     };
 
-    if (id) {
+    if (id && isMounted()) {
       fetchPrato();
     }
-  }, [id]);
+  }, [id, isMounted]);
 
   const handleAddToCart = () => {
     console.log(`Prato ${prato?.nome} adicionado ao carrinho!`);
@@ -80,7 +64,7 @@ const DetalhesPrato: React.FC = () => {
               <strong>Cozinha:</strong> {prato.cozinha}
             </p>
             <p className="text-sm text-gray-500 mb-4">
-              <strong>Valor:</strong> R$ {prato.valor.toFixed(2)}
+              <strong>Valor:</strong> R$ {prato?.valor?.toFixed(2)}
             </p>
           </div>
         </div>

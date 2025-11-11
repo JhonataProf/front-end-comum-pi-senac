@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import useForm from '../hooks/useForm';
 import { useParams } from 'react-router';
+import useForm from '../hooks/useForm';
 import api from '../http/api';
+import Prato from '../interface/Prato';
 import Snackbar from './Snackbar';
 
 export interface PratoFormProps {
@@ -24,14 +25,16 @@ const FormularioPrato: React.FC<PratoFormProps> = ({ isEditing = false }) => {
     type: 'success',
     duration: 0,
   });
-  const { values, errors, handleChange, validate, updateValues } = useForm({
+  const defaultPratoValues = {
     nome: '',
     cozinha: '',
     descricao_resumida: '',
     descricao_detalhada: '',
     imagem: '',
     valor: 0,
-  });
+  };
+  const { values, errors, handleChange, validate, updateValues } =
+    useForm(defaultPratoValues);
 
   const { id } = useParams<PratoFormParams>();
 
@@ -48,7 +51,7 @@ const FormularioPrato: React.FC<PratoFormProps> = ({ isEditing = false }) => {
             descricao_resumida,
             imagem,
             valor,
-          } = response.data[0];
+          } = response.data;
           updateValues({
             nome,
             cozinha,
@@ -59,7 +62,7 @@ const FormularioPrato: React.FC<PratoFormProps> = ({ isEditing = false }) => {
           });
         } catch {
           setSnackbar({
-            message: 'Erro ao carregar os dados do usuário',
+            message: 'Erro ao carregar os dados do prato.',
             type: 'error',
             duration: 10000,
           });
@@ -70,7 +73,7 @@ const FormularioPrato: React.FC<PratoFormProps> = ({ isEditing = false }) => {
     }
   }, [id, isEditing]);
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     const isValid = validate({
@@ -91,8 +94,22 @@ const FormularioPrato: React.FC<PratoFormProps> = ({ isEditing = false }) => {
     });
 
     if (isValid) {
-      console.log('Prato cadastrado com sucesso:', values);
-      alert('Prato cadastrado com sucesso!');
+      try {
+        await api.post<Prato[]>('/pratos', values);
+        setSnackbar({
+          message: 'Prato cadastrado com sucesso!',
+          type: 'success',
+          duration: 10000,
+        });
+        updateValues(defaultPratoValues);
+      } catch (error) {
+        console.error('Erro ao cadastrar o prato:', error);
+        setSnackbar({
+          message: 'Erro ao cadastrar o prato. Tente novamente.',
+          type: 'error',
+          duration: 10000,
+        });
+      }
     }
   };
 

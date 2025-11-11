@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import TabelaJS from '../components/TabelaJS';
+import { useIsMounted } from '../hooks/useIsMounted';
 import api from '../http/api';
 
 interface User {
@@ -14,6 +15,7 @@ const UserManagement: React.FC = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const navigate = useNavigate();
+  const isMounted = useIsMounted();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -32,20 +34,28 @@ const UserManagement: React.FC = () => {
       }
     };
 
-    fetchData();
-  }, []);
+    if (isMounted()) {
+      fetchData();
+    }
+  }, [isMounted]);
 
   const handleEdit = (user: User) => {
-    navigate(`/users/edit/${user.id}`);
+    navigate(`/admin/usuarios/editar/${user.id}`);
   };
 
-  const handleDelete = (user: User) => {
+  const handleDelete = async (user: User) => {
+    try {
+      const response = await api.delete(`/users/${user.id}`);
+      console.log('Usuário deletado com sucesso:', response.data);
+    } catch (error) {
+      console.error('Erro ao deletar o usuário:', error);
+    }
     console.log(`Deletar usuário com ID: ${user.id}`);
     setUsers((prevUsers) => prevUsers.filter((u) => u.id !== user.id));
   };
 
   const handleView = (user: User) => {
-    navigate(`/users/details/${user.id}`);
+    navigate(`/admin/usuarios/editar/${user.id}`);
   };
 
   const columns: (keyof User | 'Ações')[] = ['nome', 'email', 'role', 'Ações'];

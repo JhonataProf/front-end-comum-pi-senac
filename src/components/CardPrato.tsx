@@ -1,11 +1,14 @@
 import React, { FC } from 'react';
+import { Link } from 'react-router';
 
 interface CardPratoProps {
+  id?: number;
   nome: string;
   cozinha: string;
-  descricaoCurta: string;
+  descricao_resumida: string;
   imagem: string;
   prazoValidade?: Date; // Opcional, caso queira adicionar no futuro
+  valor?: number; // Opcional, caso queira adicionar no futuro
 }
 
 const CardPrato: FC<CardPratoProps> = (props) => {
@@ -22,7 +25,7 @@ const CardPrato: FC<CardPratoProps> = (props) => {
       <div className="p-4">
         <h2 className="text-lg font-bold">{props.nome}</h2>
         <p className="text-sm text-gray-500">{props.cozinha}</p>
-        <p className="text-sm mt-2 text-gray-700">{props.descricaoCurta}</p>
+        <p className="text-sm mt-2 text-gray-700">{props.descricao_resumida}</p>
       </div>
 
       {/* Botão de menu e dropdown */}
@@ -31,24 +34,24 @@ const CardPrato: FC<CardPratoProps> = (props) => {
           &#x22EE;
         </button>
         <div className="dropdown-menu absolute right-0 mt-2 bg-white shadow-lg rounded-lg w-40 opacity-0 invisible group-hover:opacity-100 group-hover:visible group-focus-within:opacity-100 group-focus-within:visible transition-all duration-200">
-          <a
-            href="#"
+          <Link
+            to="/carrinho"
             className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
           >
             Ir para carrinho
-          </a>
+          </Link>
           <a
             href="#"
             className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
           >
             Adicionar ao carrinho +
           </a>
-          <a
-            href="#"
+          <Link
+            to={`/detalhes/${props?.id}`}
             className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
           >
             Ver Detalhes
-          </a>
+          </Link>
         </div>
       </div>
     </div>

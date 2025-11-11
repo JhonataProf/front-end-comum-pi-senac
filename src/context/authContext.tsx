@@ -1,30 +1,37 @@
-import React, { createContext, useState, useEffect, ReactNode } from "react";
-import Usuario from "../interface/Usuario";
+import React, { createContext, ReactNode, useEffect, useState } from 'react';
+import Usuario from '../interface/Usuario';
 
 interface AuthContextType {
   usuario: Usuario | null;
   verificarLogin: () => void;
 }
 
-export const AuthContext = createContext<AuthContextType | undefined>(undefined);
+export const AuthContext = createContext<AuthContextType | undefined>(
+  undefined,
+);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [usuario, setUsuario] = useState<Usuario|null>(null);
+  const [usuario, setUsuario] = useState<Usuario | null>(null);
 
   const verificarLogin = () => {
-    const token = localStorage.getItem("token");
-    if (!token || token === "undefined" || token === "null") {
-      window.location.href = "/login";
+    const token = localStorage.getItem('token');
+    if (!token || token === 'undefined' || token === 'null') {
+      window.location.href = '/login';
       return;
     }
-    const dadosUsuario = atob(token.split(".")[1]);
+    const dadosUsuario = atob(token.split('.')[1]);
     if (dadosUsuario) {
       setUsuario(JSON.parse(dadosUsuario));
     }
   };
 
   useEffect(() => {
-    verificarLogin();
+    if (
+      location.pathname.startsWith('/admin') ||
+      location.pathname.startsWith('/api')
+    ) {
+      verificarLogin();
+    }
   }, []);
   return (
     <AuthContext.Provider value={{ usuario, verificarLogin }}>

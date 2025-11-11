@@ -1,6 +1,7 @@
 import React, { useContext, useState } from 'react';
 import {
   FiDisc,
+  FiEdit3,
   FiHome,
   FiLogOut,
   FiMenu,
@@ -37,6 +38,7 @@ const RestrictedLayout: React.FC = () => {
     { path: '/admin/logout', label: 'Logout', icon: <FiLogOut /> },
     { path: '/admin/novo-prato', label: 'Novo Prato', icon: <FiDisc /> },
     { path: '/admin/usuarios', label: 'Usuários', icon: <FiUsers /> },
+    { path: '/admin/pedidos', label: 'pedidos', icon: <FiEdit3 /> },
   ];
 
   return (

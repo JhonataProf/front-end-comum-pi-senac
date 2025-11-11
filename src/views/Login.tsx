@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
-import useForm from '../hooks/useForm';
-import Snackbar from '../components/Snackbar';
-import api from '../http/api';
 import { useNavigate } from 'react-router';
-// import { useNavigate } from 'react-router-dom';
+import Snackbar from '../components/Snackbar';
+import useForm from '../hooks/useForm';
+import api from '../http/api';
 
 interface SnackbarState {
   message: string;
@@ -66,40 +65,6 @@ export default function Login() {
     }
   };
 
-  // <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-4">
-  //     <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-sm sm:max-w-md md:max-w-lg lg:max-w-xl">
-  //       <h2 className="text-2xl font-bold mb-4 text-center">Login</h2>
-  //       <ValidatedInput
-  //         type="text"
-  //         placeholder="Digite seu email de login"
-  //         value={email}
-  //         onChange={handleEmailChange}
-  //         error={emailError}
-  //       />
-  //       <ValidatedInput
-  //         type="password"
-  //         placeholder="Digite sua senha"
-  //         value={senha}
-  //         onChange={handleSenhaChange}
-  //         error={senhaError}
-  //       />
-  //       <button
-  //         type="button"
-  //         onClick={login}
-  //         className="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600"
-  //       >
-  //         Entrar
-  //       </button>
-  //     </div>
-  //     <Snackbar
-  //       message={snackbar.message}
-  //       type={snackbar.type}
-  //       duration={snackbar.duration}
-  //       onClose={() =>
-  //         setSnackbar({ message: '', type: 'success', duration: 0 })
-  //       }
-  //     />
-  //   </div>
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-4">
       <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-sm sm:max-w-md md:max-w-lg lg:max-w-xl">

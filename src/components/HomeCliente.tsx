@@ -1,61 +1,25 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import React from 'react';
-import '../estilos/Home.css';
-import CardPrato from './CardPrato';
+import React, { useEffect } from 'react';
 import { CartContext } from '../context/cartContext';
+import '../estilos/Home.css';
+import api from '../http/api';
+import Prato from '../interface/Prato';
+import CardPrato from './CardPrato';
+import { useIsMounted } from '../hooks/useIsMounted';
 
 function HomeCliente() {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [pratos, setPratos] = React.useState([
-    {
-      nome: 'Feijoada',
-      cozinha: 'Brasileira',
-      descricaoCurta:
-        'Feijoada completa, com pedaços suculentos de carne suína e aquele sabor brasileiro incomparável.',
-      imagem:
-        'https://media.istockphoto.com/id/899497396/pt/foto/delicious-brazilian-feijoada.jpg?s=2048x2048&w=is&k=20&c=OO_JGRT2AgsybJxSFB-mFP2vsOn7QtsbqEd1sZiUzuw=',
-    },
-    {
-      nome: 'Moqueca',
-      cozinha: 'Brasileira',
-      descricaoCurta:
-        'Moqueca de peixe com leite de coco, temperos frescos e um toque de azeite de dendê.',
-      imagem:
-        'https://media.istockphoto.com/id/1137377098/pt/foto/moqueca-brazilian-seafood-stew.jpg?s=2048x2048&w=is&k=20&c=Z5Qv8vQ9X9z9J9Z9J9z9J9Z9J9z9J9Z9J9z9J9Z9J9z9=',
-    },
-    {
-      nome: 'Churrasco',
-      cozinha: 'Brasileira',
-      descricaoCurta:
-        'Churrasco brasileiro com cortes nobres de carne e acompanhamentos tradicionais.',
-      imagem:
-        'https://media.istockphoto.com/id/1141234567/pt/foto/brazilian-barbecue.jpg?s=2048x2048&w=is&k=20&c=Z5Qv8vQ9X9z9J9Z9J9z9J9Z9J9z9J9Z9J9z9J9Z9J9z9=',
-    },
-    {
-      nome: 'Acarajé',
-      cozinha: 'Brasileira',
-      descricaoCurta:
-        'Acarajé crocante recheado com vatapá, camarão seco e pimenta.',
-      imagem:
-        'https://media.istockphoto.com/id/1151234567/pt/foto/acaraje.jpg?s=2048x2048&w=is&k=20&c=Z5Qv8vQ9X9z9J9Z9J9z9J9Z9J9z9J9Z9J9z9J9Z9J9z9=',
-    },
-    {
-      nome: 'Pão de Queijo',
-      cozinha: 'Brasileira',
-      descricaoCurta:
-        'Pão de queijo mineiro, crocante por fora e macio por dentro.',
-      imagem:
-        'https://media.istockphoto.com/id/1161234567/pt/foto/pao-de-queijo.jpg?s=2048x2048&w=is&k=20&c=Z5Qv8vQ9X9z9J9Z9J9z9J9Z9J9z9J9Z9J9z9J9Z9J9z9=',
-    },
-    {
-      nome: 'Brigadeiro',
-      cozinha: 'Brasileira',
-      descricaoCurta:
-        'Brigadeiro tradicional, doce de chocolate com granulado por fora.',
-      imagem:
-        'https://media.istockphoto.com/id/1171234567/pt/foto/brigadeiro.jpg?s=2048x2048&w=is&k=20&c=Z5Qv8vQ9X9z9J9Z9J9z9J9Z9J9z9J9Z9J9z9J9Z9J9z9=',
-    },
-  ]);
+  const isMounted = useIsMounted();
+  const [pratos, setPratos] = React.useState<Prato[] | []>([]);
+
+  useEffect(() => {
+    const fetchPratos = async () => {
+      const response = await api.get<Prato[]>('/pratos');
+      setPratos(response.data);
+    };
+    if (isMounted()) {
+      fetchPratos();
+    }
+  }, [isMounted]);
 
   const cartContext = React.useContext(CartContext);
 
