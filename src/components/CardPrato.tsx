@@ -13,7 +13,7 @@ interface CardPratoProps {
 
 const CardPrato: FC<CardPratoProps> = (props) => {
   return (
-    <div className="relative bg-white shadow-md rounded-lg overflow-hidden">
+    <div className="min-h-full relative bg-white shadow-md rounded-lg overflow-hidden">
       {/* Imagem do prato */}
       <img
         src={props.imagem}

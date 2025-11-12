@@ -2,10 +2,10 @@
 import React, { useEffect } from 'react';
 import { CartContext } from '../context/cartContext';
 import '../estilos/Home.css';
+import { useIsMounted } from '../hooks/useIsMounted';
 import api from '../http/api';
 import Prato from '../interface/Prato';
 import CardPrato from './CardPrato';
-import { useIsMounted } from '../hooks/useIsMounted';
 
 function HomeCliente() {
   const isMounted = useIsMounted();
@@ -39,14 +39,18 @@ function HomeCliente() {
         Pratos Disponíveis
       </h1>
       <div className="flex flex-wrap justify-center gap-6">
-        {pratos.map((prato, index) => (
-          <div
-            key={index}
-            className="w-full sm:w-1/2 lg:w-1/4 bg-white shadow-md rounded-lg overflow-hidden"
-          >
-            <CardPrato {...prato} />
-          </div>
-        ))}
+        {pratos.length ? (
+          pratos.map((prato, index) => (
+            <div
+              key={index}
+              className="w-full sm:w-1/2 lg:w-1/4 bg-white shadow-md rounded-lg overflow-hidden"
+            >
+              <CardPrato {...prato} />
+            </div>
+          ))
+        ) : (
+          <p>Nenhum prato disponível no momento.</p>
+        )}
       </div>
     </div>
   );

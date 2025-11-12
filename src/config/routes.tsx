@@ -26,7 +26,7 @@ const routes: RouteConfig[] = [
     element: <Login />,
   },
   {
-    path: 'cardapio',
+    path: '/',
     element: (
       <CartProvider>
         <HomeCliente />
@@ -50,11 +50,11 @@ const routes: RouteConfig[] = [
     ),
   },
   {
-    path: '/',
+    path: '/admin',
     element: <ProtectedRoute />,
     children: [
       {
-        path: 'admin',
+        path: '',
         element: (
           <AuthProvider>
             <RestrictedLayout />
@@ -99,7 +99,7 @@ const routes: RouteConfig[] = [
   },
   {
     path: '*',
-    element: <Navigate to="/cardapio" replace />,
+    element: <Navigate to="/" replace />,
   },
 ];
 

@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useContext, useState } from 'react';
 import { CartContext } from '../context/cartContext';
+import { useNavigate } from 'react-router';
 
 interface Dish {
   id: number;
@@ -16,6 +17,7 @@ const ShoppingCart: React.FC = () => {
     { id: 3, name: 'Prato 3', price: 20.0, quantity: 1 },
   ]);
 
+  const navigate = useNavigate();
   const [address, setAddress] = useState<string>('');
   const [paymentInfo, setPaymentInfo] = useState<string>('');
 
@@ -54,6 +56,12 @@ const ShoppingCart: React.FC = () => {
       {/* Dados do cliente e pagamento */}
       <div className="flex-1 bg-white shadow-lg rounded-lg p-4">
         <h2 className="text-xl font-bold mb-4">Dados do Cliente</h2>
+        <button
+            onClick={() => navigate(-1)}
+            className="bg-gray-300 text-gray-700 px-4 py-2 rounded hover:bg-gray-400"
+          >
+            Voltar
+          </button>
         <div className="mb-4">
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Endereço de Entrega
