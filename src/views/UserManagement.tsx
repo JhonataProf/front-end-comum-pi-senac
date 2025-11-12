@@ -1,57 +1,64 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import api from '../http/api';
-import Snackbar from '../components/Snackbar';
 import TabelaJS from '../components/TabelaJS';
+import { useIsMounted } from '../hooks/useIsMounted';
+import api from '../http/api';
 
-export interface User {
+interface User {
   id: number;
   nome: string;
   email: string;
+  role: string;
 }
 
-interface SnackbarPropsState {
-  message: string;
-  type: 'success' | 'error' | 'warning' | 'info';
-  duration: number;
-}
-
-export default function UserManagement() {
-  const [users, setUsers] = useState<Array<User> | []>([]);
-  const [snackbar, setSnackbar] = useState<SnackbarPropsState>({
-    message: '',
-    type: 'success',
-    duration: 0,
-  });
+const UserManagement: React.FC = () => {
+  const [users, setUsers] = useState<User[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
   const navigate = useNavigate();
+  const isMounted = useIsMounted();
 
   useEffect(() => {
-    async function fetchData() {
+    const fetchData = async () => {
       try {
-        const response = await api['get']('/users');
-        const { data } = response;
-        console.log('usuarios', data);
-
+        // const response = await fetch('/api/users'); // Substitua pela URL correta da sua API
+        const response = await api.get<User[]>('/users/');
+        if (!response.status.toString().startsWith('2')) {
+          throw new Error('Erro ao buscar os usuários');
+        }
+        const data: User[] = response.data;
         setUsers(data);
-
-        setSnackbar({
-          message: 'Lista de usuários carregada com sucesso',
-          type: 'success',
-          duration: 10000,
-        });
-      } catch (error: unknown) {
-        const axiosError = error as {
-          response?: { data?: { message?: string } };
-        };
-        setSnackbar({
-          message: axiosError.response?.data?.message || 'Erro na requisição.',
-          type: 'error',
-          duration: 10000,
-        });
+      } catch (error) {
+        console.error('Erro ao buscar os usuários:', error);
+      } finally {
+        setLoading(false);
       }
+    };
+
+    if (isMounted()) {
+      fetchData();
     }
-    fetchData();
-  }, []);
+  }, [isMounted]);
+
+  const handleEdit = (user: User) => {
+    navigate(`/admin/usuarios/editar/${user.id}`);
+  };
+
+  const handleDelete = async (user: User) => {
+    try {
+      const response = await api.delete(`/users/${user.id}`);
+      console.log('Usuário deletado com sucesso:', response.data);
+    } catch (error) {
+      console.error('Erro ao deletar o usuário:', error);
+    }
+    console.log(`Deletar usuário com ID: ${user.id}`);
+    setUsers((prevUsers) => prevUsers.filter((u) => u.id !== user.id));
+  };
+
+  const handleView = (user: User) => {
+    navigate(`/admin/usuarios/editar/${user.id}`);
+  };
+
+  const columns: (keyof User | 'Ações')[] = ['nome', 'email', 'role', 'Ações'];
 
   return (
     <div className="p-6">
@@ -60,17 +67,26 @@ export default function UserManagement() {
         <button
           type="button"
           onClick={() => navigate('/users/new')}
-          className="bg-green-500 text-white p-2 rounded flex items-center hover:bg-green-600"
+          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
         >
-          <span className="mr-2">+</span> Novo
+          Novo Usuário
         </button>
       </div>
-      <TabelaJS users={users} />
-      <Snackbar
-        message={snackbar.message}
-        duration={snackbar.duration}
-        type={snackbar.type}
-      />
+      {loading ? (
+        <p className="text-center">Carregando usuários...</p>
+      ) : (
+        <TabelaJS
+          columns={columns}
+          data={users}
+          actions={{
+            edit: handleEdit,
+            delete: handleDelete,
+            view: handleView,
+          }}
+        />
+      )}
     </div>
   );
-}
+};
+
+export default UserManagement;

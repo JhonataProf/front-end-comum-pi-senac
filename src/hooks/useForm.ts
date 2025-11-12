@@ -1,12 +1,18 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 
 const useForm = <T extends Record<string, unknown>>(initialValues: T) => {
   const [values, setValues] = useState<T>(initialValues);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const handleChange =
-    (field: keyof T) => (e: React.ChangeEvent<HTMLInputElement>) => {
-      setValues({ ...values, [field]: e.target.value });
+    (field: keyof T) =>
+    (
+      e:
+        | React.ChangeEvent<HTMLInputElement>
+        | React.ChangeEvent<HTMLTextAreaElement>,
+    ) => {
+      const target = e.target as HTMLInputElement | HTMLTextAreaElement;
+      setValues({ ...values, [field]: target.value });
     };
 
   const validate = (
@@ -21,7 +27,7 @@ const useForm = <T extends Record<string, unknown>>(initialValues: T) => {
     return Object.keys(newErrors).length === 0; // Retorna true se não houver erros
   };
 
-  return { values, errors, handleChange, validate };
+  return { values, errors, handleChange, validate, updateValues: setValues };
 };
 
 export default useForm;

@@ -1,7 +1,8 @@
-import React, { useState, useEffect, JSX } from 'react';
+import React, { JSX, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import api from '../http/api';
 import Snackbar from '../components/Snackbar';
+import { useIsMounted } from '../hooks/useIsMounted';
+import api from '../http/api';
 
 interface SnackbarState {
   message: string;
@@ -28,6 +29,7 @@ function UserForm({ isEditing = false }: UserFormProps): JSX.Element {
   });
 
   const navigate = useNavigate();
+  const isMounted = useIsMounted();
   const { id } = useParams<UserFormParams>();
 
   useEffect(() => {
@@ -50,9 +52,11 @@ function UserForm({ isEditing = false }: UserFormProps): JSX.Element {
         }
       };
 
-      fetchUser();
+      if (isMounted()) {
+        fetchUser();
+      }
     }
-  }, [id, isEditing]);
+  }, [id, isEditing, isMounted]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -74,7 +78,7 @@ function UserForm({ isEditing = false }: UserFormProps): JSX.Element {
           type: 'success',
           duration: 10000,
         });
-        navigate('/users');
+        navigate('/admin/usuarios');
       }
     } catch (error: unknown) {
       const axiosError = error as {

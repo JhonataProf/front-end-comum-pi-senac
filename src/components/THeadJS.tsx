@@ -1,7 +1,7 @@
 import React from 'react';
 
 interface THeadJSProps {
-  columns: string[]; // Lista de nomes das colunas
+  columns: string[];
 }
 
 const THeadJS: React.FC<THeadJSProps> = ({ columns }) => {

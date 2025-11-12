@@ -1,11 +1,18 @@
 import React from 'react';
 import { Navigate } from 'react-router-dom';
-import Login from '../views/Login';
-import Home from '../views/Home';
-import UserManagement from '../views/UserManagement';
-import UserForm from '../views/UserForm';
 import ProtectedRoute from '../ProtectedRoute';
+import DetalhesPrato from '../components/DetalhesPrato';
+import FormularioPrato from '../components/FormularioPrato';
+import HomeCliente from '../components/HomeCliente';
+import ShoppingCart from '../components/ShoppingCart';
+import { AuthProvider } from '../context/authContext';
+import { CartProvider } from '../context/cartContext';
 import RestrictedLayout from '../layout/RestrictedLayout';
+import Home from '../views/Home';
+import Login from '../views/Login';
+import OrderManagement from '../views/OrderManagement';
+import UserForm from '../views/UserForm';
+import UserManagement from '../views/UserManagement';
 
 export interface RouteConfig {
   path: string;
@@ -20,31 +27,71 @@ const routes: RouteConfig[] = [
   },
   {
     path: '/',
+    element: (
+      <CartProvider>
+        <HomeCliente />
+      </CartProvider>
+    ),
+  },
+  {
+    path: '/detalhes/:id',
+    element: (
+      <CartProvider>
+        <DetalhesPrato />
+      </CartProvider>
+    ),
+  },
+  {
+    path: '/carrinho',
+    element: (
+      <CartProvider>
+        <ShoppingCart />
+      </CartProvider>
+    ),
+  },
+  {
+    path: '/admin',
     element: <ProtectedRoute />,
     children: [
       {
-        path: '/',
-        element: <RestrictedLayout />,
+        path: '',
+        element: (
+          <AuthProvider>
+            <RestrictedLayout />
+          </AuthProvider>
+        ),
         children: [
           {
-            path: '/',
-            element: <Navigate to="/home" replace />,
+            path: '',
+            element: <Navigate to="home" replace />,
           },
           {
-            path: '/home',
+            path: 'novo-prato',
+            element: <FormularioPrato />,
+          },
+          {
+            path: 'detalhes-prato/:id',
+            element: <FormularioPrato isEditing />,
+          },
+          {
+            path: 'home',
             element: <Home />,
           },
           {
-            path: '/users',
+            path: 'usuarios',
             element: <UserManagement />,
           },
           {
-            path: '/users/new',
+            path: 'usuarios/novo',
             element: <UserForm />,
           },
           {
-            path: '/users/edit/:id',
+            path: 'usuarios/editar/:id',
             element: <UserForm isEditing />,
+          },
+          {
+            path: 'pedidos',
+            element: <OrderManagement />,
           },
         ],
       },
@@ -52,7 +99,7 @@ const routes: RouteConfig[] = [
   },
   {
     path: '*',
-    element: <Navigate to="/home" replace />,
+    element: <Navigate to="/" replace />,
   },
 ];
 
