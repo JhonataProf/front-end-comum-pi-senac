@@ -1,7 +1,6 @@
 import React from 'react';
 import adicionarPrato from '../assets/imagem_adicionar_prato.jpg';
 import { Link } from 'react-router-dom';
-import '../styles/CardNovoPrato.css';
 
 const CardNovoPrato = () => {
   const meuTitulo = 'Clique aqui para adicionar um novo prato';

@@ -4,8 +4,8 @@ import TabelaJS from '../components/TabelaJS';
 import api from '../http/api';
 
 interface Pedido {
-  prato: string;
-  valor: number;
+  pratos: string;
+  valor_unitario: number;
   quantidade: number;
   total: number;
   status: string;
@@ -21,6 +21,7 @@ const PedidoManagement: React.FC = () => {
     const fetchData = async () => {
       try {
         const response = await api.get<Pedido[]>('/pedidos');
+        console.log('Resposta da API:', response.data);
         if (!response.status.toString().startsWith('2')) {
           throw new Error('Erro ao buscar os pedidos');
         }
@@ -48,8 +49,8 @@ const PedidoManagement: React.FC = () => {
   };
 
   const columns: (keyof Pedido | 'Ações')[] = [
-    'prato',
-    'valor',
+    'pratos',
+    'valor_unitario',
     'quantidade',
     'total',
     'status',

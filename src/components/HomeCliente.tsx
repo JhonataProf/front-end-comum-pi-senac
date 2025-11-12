@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import React from 'react';
-import '../estilos/Home.css';
 import CardPrato from './CardPrato';
 import { CartContext } from '../context/cartContext';
+import { useNavigate } from 'react-router';
 
 function HomeCliente() {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -69,11 +69,14 @@ function HomeCliente() {
     removerPrato,
   } = cartContext;
 
+  const navigate = useNavigate();
+
   return (
     <div className="min-h-screen bg-gray-100 p-6">
       <h1 className="text-3xl font-bold text-center mb-6">
         Pratos Disponíveis
       </h1>
+      <button onClick={() => navigate('/login')}>Login</button>
       <div className="flex flex-wrap justify-center gap-6">
         {pratos.map((prato, index) => (
           <div

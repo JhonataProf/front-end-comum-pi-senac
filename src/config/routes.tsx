@@ -51,11 +51,11 @@ const routes: RouteConfig[] = [
     ),
   },
   {
-    path: '/',
+    path: '/admin',
     element: <ProtectedRoute />,
     children: [
       {
-        path: 'admin',
+        path: '',
         element: (
           <AuthProvider>
             <RestrictedLayout />
@@ -73,10 +73,6 @@ const routes: RouteConfig[] = [
           {
             path: 'novo-pedido',
             element: <FormularioPedido />,
-          },
-          {
-            path: 'novo-pedido',
-            element: <FormularioPedido isEditing />,
           },
           {
             path: 'detalhes-prato/:id',

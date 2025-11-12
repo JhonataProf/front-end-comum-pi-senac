@@ -35,15 +35,15 @@ const FormularioPedido: React.FC<PedidoFormProps> = ({ isEditing = false }) => {
   const [pratos, setPratos] = useState<Prato[]>([]);
   const { id } = useParams<PedidoFormParams>();
 
-  const { values, errors, handleChange, validate, updateValues } = useForm({
-    pedidoId: 0, // <--- adicionado
+  const { values, errors, handleChange, updateValues } = useForm({
+    pedidoId: '', // <--- adicionado
     pratoId: 0,
     nome: '',
-    prato: '',
     valor: 0,
     quantidade: 1,
     total: 0,
     status: '',
+    telefone: '',
   });
 
   // Busca os pratos disponíveis
@@ -75,13 +75,13 @@ const FormularioPedido: React.FC<PedidoFormProps> = ({ isEditing = false }) => {
     if (isEditing && id) {
       const fetchPedido = async () => {
         try {
-          const response = await api.get(`/pedidos/${id}`);
+          const response = await api.get(`api/pedidos/${id}`);
           const pedido = response.data[0];
           updateValues({
+            telefone: pedido.telefone,
             pedidoId: pedido.id,
             pratoId: pedido.pratoId,
             nome: pedido.nome,
-            prato: pedido.prato,
             valor: pedido.valor,
             quantidade: pedido.quantidade,
             total: pedido.total,
@@ -111,39 +111,46 @@ const FormularioPedido: React.FC<PedidoFormProps> = ({ isEditing = false }) => {
         pedidoId: values.pedidoId,
         pratoId: pratoSelecionado.id,
         nome: pratoSelecionado.nome, // ⬅️ preencher corretamente
-        prato: pratoSelecionado.prato, // ⬅️ preencher corretamente
         valor: pratoSelecionado.valor,
         quantidade: values.quantidade,
         total: Number(pratoSelecionado.valor) * Number(values.quantidade),
         status: values.status,
       });
     } else {
-      updateValues({ ...values, prato: '', valor: 0 });
+      updateValues({ ...values, valor: 0 });
     }
   };
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    console.log(' laksjdçflaksjdçlf');
     e.preventDefault();
 
-    const isValid = validate({
-      pedidoId: () => null,
-      pratoId: (value) =>
-        !value || Number(value) <= 0 ? 'O prato é obrigatório.' : null,
-      nome: (value) => (!value ? 'O nome é obrigatório.' : null),
-      prato: (value) => (!value ? 'O prato é obrigatório.' : null),
-      valor: (value) =>
-        !value || isNaN(Number(value))
-          ? 'O valor deve ser um número válido.'
-          : null,
-      quantidade: (value) =>
-        !value || Number(value) <= 0
-          ? 'A quantidade deve ser um número positivo.'
-          : null,
-      status: (value) => (!value ? 'O status é obrigatório.' : null),
-      total: () => null,
-    });
+    // const isValid = validate({
+    //   pedidoId: () => null,
+    //   pratoId: (value) =>
+    //     !value || Number(value) <= 0 ? 'O prato é obrigatório.' : null,
+    //   nome: (value) => (!value ? 'O nome é obrigatório.' : null),
+    //   valor: (value) =>
+    //     !value || isNaN(Number(value))
+    //       ? 'O valor deve ser um número válido.'
+    //       : null,
+    //   quantidade: (value) =>
+    //     !value || Number(value) <= 0
+    //       ? 'A quantidade deve ser um número positivo.'
+    //       : null,
+    //   status: (value) => (!value ? 'O status é obrigatório.' : null),
+    //   total: () => null,
+    //   telefone: (value) =>
+    //     !value
+    //       ? 'O número de telefone é obrigatório.'
+    //       : !/^\(?\d{2}\)?[\s-]?\d{4,5}-?\d{4}$/.test(value as string)
+    //         ? 'Digite um número de telefone válido (ex: (11) 91234-5678).'
+    //         : null,
+    // });
 
-    if (!isValid) return;
+    // console.log('Validação:', isValid, values);
+
+    // if (!isValid) return;
 
     if (isEditing) {
       console.log('Pedido atualizado com sucesso:', values);
@@ -159,6 +166,28 @@ const FormularioPedido: React.FC<PedidoFormProps> = ({ isEditing = false }) => {
         type: 'success',
         duration: 4000,
       });
+      const user = JSON.parse(localStorage.getItem('user') || '{}');
+      api
+        .post('/pedidos', {
+          usuarioId: user.id,
+          clienteTelefone: values.telefone,
+          itens: [
+            {
+              produtoId: values.pratoId,
+              quantidade: values.quantidade,
+              precoUnitario: values.valor,
+              status: values.status,
+            },
+          ],
+        })
+        .catch((error) => {
+          console.error('Erro ao cadastrar pedido:', error);
+          setSnackbar({
+            message: 'Erro ao cadastrar o pedido.',
+            type: 'error',
+            duration: 8000,
+          });
+        });
     }
   };
 
@@ -238,6 +267,23 @@ const FormularioPedido: React.FC<PedidoFormProps> = ({ isEditing = false }) => {
             className="w-full border rounded p-2 bg-gray-100 text-gray-600 cursor-not-allowed"
           />
         </div>
+        {/* Telefone */}
+        <div className="mb-4">
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Telefone do Usuário
+          </label>
+          <input
+            type="tel"
+            name="telefone"
+            value={values.telefone}
+            onChange={handleChange('telefone')}
+            placeholder="(11) 91234-5678"
+            className={`w-full border rounded p-2 ${errors.telefone ? 'border-red-500' : 'border-gray-300'}`}
+          />
+          {errors.telefone && (
+            <p className="text-red-500 text-sm">{errors.telefone}</p>
+          )}
+        </div>
 
         {/* Status */}
         <div className="mb-4">
@@ -251,9 +297,9 @@ const FormularioPedido: React.FC<PedidoFormProps> = ({ isEditing = false }) => {
             className={`w-full border rounded p-2 ${errors.status ? 'border-red-500' : 'border-gray-300'}`}
           >
             <option value="">Selecione o status</option>
-            <option value="Aguardando">Aguardando</option>
+            <option value="Aguardando">Pago</option>
             <option value="Em preparo">Em preparo</option>
-            <option value="Entregue">Entregue</option>
+            <option value="Entregue">Enviado</option>
             <option value="Cancelado">Cancelado</option>
           </select>
           {errors.status && (

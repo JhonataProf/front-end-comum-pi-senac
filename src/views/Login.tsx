@@ -26,7 +26,7 @@ export default function Login() {
   const navigate = useNavigate();
 
   const login = async () => {
-    const duration = 5000;
+    const duration = 1000;
 
     if (!validate) {
       return;
@@ -36,22 +36,34 @@ export default function Login() {
         token: string;
         refreshToken: string;
         message: string;
+        user: { id: number; email: string; nome: string };
       }>('/login', {
         email: values.email,
         senha: values.senha,
       });
 
-      const { token, refreshToken, message } = response.data;
+      const { token, refreshToken, message, user } = response.data;
+      console.log('Resposta da API:', response.data);
 
       localStorage.setItem('token', token);
       localStorage.setItem('refreshToken', refreshToken);
+      localStorage.setItem('user', JSON.stringify(user));
+
+      // Decodificar o token para obter a role
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      const userRole = payload.role;
+
       setSnackbar({
         message: message || 'Sucesso ao logar.',
         type: 'success',
         duration,
       });
       setTimeout(() => {
-        navigate('/admin/home');
+        if (userRole === 'Cliente') {
+          navigate('/cardapio');
+        } else {
+          navigate('/admin/home');
+        }
       }, duration);
     } catch (error: unknown) {
       const axiosError = error as {
