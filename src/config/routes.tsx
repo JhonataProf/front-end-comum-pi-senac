@@ -5,14 +5,14 @@ import DetalhesPrato from '../components/DetalhesPrato';
 import FormularioPrato from '../components/FormularioPrato';
 import HomeCliente from '../components/HomeCliente';
 import ShoppingCart from '../components/ShoppingCart';
-import { AuthProvider } from '../context/authContext';
-import { CartProvider } from '../context/cartContext';
-import RestrictedLayout from '../layout/RestrictedLayout';
+import RestrictedLayout from '../components/layout/RestrictedLayout';
 import Home from '../views/Home';
 import Login from '../views/Login';
 import OrderManagement from '../views/OrderManagement';
 import UserForm from '../views/UserForm';
 import UserManagement from '../views/UserManagement';
+import PublicLayout from '../components/layout/PublicLayout';
+import OrderForm from '../views/orderForm';
 
 export interface RouteConfig {
   path: string;
@@ -27,27 +27,21 @@ const routes: RouteConfig[] = [
   },
   {
     path: '/',
-    element: (
-      <CartProvider>
-        <HomeCliente />
-      </CartProvider>
-    ),
-  },
-  {
-    path: '/detalhes/:id',
-    element: (
-      <CartProvider>
-        <DetalhesPrato />
-      </CartProvider>
-    ),
-  },
-  {
-    path: '/carrinho',
-    element: (
-      <CartProvider>
-        <ShoppingCart />
-      </CartProvider>
-    ),
+    element: <PublicLayout />,
+    children: [
+      {
+        path: '',
+        element: <HomeCliente />,
+      },
+      {
+        path: 'detalhes/:id',
+        element: <DetalhesPrato />,
+      },
+      {
+        path: 'carrinho',
+        element: <ShoppingCart />,
+      },
+    ],
   },
   {
     path: '/admin',
@@ -55,11 +49,7 @@ const routes: RouteConfig[] = [
     children: [
       {
         path: '',
-        element: (
-          <AuthProvider>
-            <RestrictedLayout />
-          </AuthProvider>
-        ),
+        element: <RestrictedLayout />,
         children: [
           {
             path: '',
@@ -92,6 +82,14 @@ const routes: RouteConfig[] = [
           {
             path: 'pedidos',
             element: <OrderManagement />,
+          },
+          {
+            path: 'pedidos/novo',
+            element: <OrderForm />,
+          },
+          {
+            path: 'pedidos/editar/:id',
+            element: <OrderForm isEditing />,
           },
         ],
       },
