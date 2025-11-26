@@ -1,41 +1,127 @@
-import React, { createContext, ReactNode, useEffect, useState } from 'react';
-import Usuario from '../interface/Usuario';
+// src/context/authContext.tsx
+import React, {
+  createContext,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+  ReactNode,
+} from 'react';
 
-interface AuthContextType {
+import Usuario, { Role } from 'domain/usuario'; // ajuste o caminho se estiver diferente
+import { parseJwtPayload } from 'utils/auth';
+
+export interface AuthContextType {
   usuario: Usuario | null;
-  verificarLogin: () => void;
+  isAuthenticated: boolean;
+  login: (
+    usuario: Usuario,
+    tokens?: { token?: string; refreshToken?: string },
+  ) => void;
+  logout: () => void;
+  verificarLogin: () => boolean;
 }
 
 export const AuthContext = createContext<AuthContextType | undefined>(
   undefined,
 );
 
-export const AuthProvider = ({ children }: { children: ReactNode }) => {
+const AUTH_TOKEN_KEY = 'token';
+const AUTH_REFRESH_TOKEN_KEY = 'refreshToken';
+
+interface AuthProviderProps {
+  children: ReactNode;
+}
+
+function clearAuthStorage() {
+  try {
+    localStorage.removeItem(AUTH_TOKEN_KEY);
+    localStorage.removeItem(AUTH_REFRESH_TOKEN_KEY);
+  } catch {
+    // ignore
+  }
+}
+
+export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [usuario, setUsuario] = useState<Usuario | null>(null);
 
-  const verificarLogin = () => {
-    const token = localStorage.getItem('token');
-    if (!token || token === 'undefined' || token === 'null') {
-      window.location.href = '/login';
-      return;
-    }
-    const dadosUsuario = atob(token.split('.')[1]);
-    if (dadosUsuario) {
-      setUsuario(JSON.parse(dadosUsuario));
-    }
-  };
-
+  // Carrega o usuário a partir do token salvo, se existir
   useEffect(() => {
-    if (
-      location.pathname.startsWith('/admin') ||
-      location.pathname.startsWith('/api')
-    ) {
-      verificarLogin();
+    try {
+      const token = localStorage.getItem(AUTH_TOKEN_KEY);
+      if (!token) return;
+
+      const parsed = parseJwtPayload(token);
+      const payload = parsed?.payload;
+      if (!payload) {
+        clearAuthStorage();
+        setUsuario(null);
+        return;
+      }
+
+      const role = (payload.role as Role | string | undefined) ?? 'CLIENTE';
+
+      const user: Usuario = {
+        id: String(payload.sub ?? ''),
+        email: payload.email,
+        role: role as Role,
+      };
+
+      setUsuario(user);
+      // if (isExpired) {
+      //   // 🔎 Opcional: só log de debug, sem deslogar
+      //   if (process.env.NODE_ENV === 'development') {
+      //     console.warn('[AuthProvider] Token carregado está expirado. O refresh será tratado via interceptor quando a API retornar 401.');
+      //   }
+      // }
+    } catch (error) {
+      console.error('Erro ao inicializar AuthContext:', error);
+      clearAuthStorage();
+      setUsuario(null);
     }
   }, []);
+
+  const login = useCallback(
+    (
+      user: Usuario,
+      tokens?: { token?: string; refreshToken?: string },
+    ) => {
+      // Se o BFF ainda não salvou os tokens, podemos salvar aqui
+      if (tokens?.token) {
+        localStorage.setItem(AUTH_TOKEN_KEY, tokens.token);
+      }
+      if (tokens?.refreshToken) {
+        localStorage.setItem(AUTH_REFRESH_TOKEN_KEY, tokens.refreshToken);
+      }
+
+      setUsuario(user);
+    },
+    [],
+  );
+
+  const logout = useCallback(() => {
+    clearAuthStorage();
+    setUsuario(null);
+  }, []);
+
+  const verificarLogin = useCallback(() => {
+    return Boolean(usuario);
+  }, [usuario]);
+
+  const isAuthenticated = Boolean(usuario);
+
+  const value = useMemo<AuthContextType>(
+    () => ({
+      usuario,
+      isAuthenticated,
+      login,
+      logout,
+      verificarLogin,
+    }),
+    [usuario, isAuthenticated, login, logout, verificarLogin],
+  );
+
   return (
-    <AuthContext.Provider value={{ usuario, verificarLogin }}>
-      {children}
-    </AuthContext.Provider>
+    <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
   );
 };

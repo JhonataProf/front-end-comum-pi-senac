@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 
 const useForm = <T extends Record<string, unknown>>(initialValues: T) => {
   const [values, setValues] = useState<T>(initialValues);
@@ -24,7 +24,7 @@ const useForm = <T extends Record<string, unknown>>(initialValues: T) => {
       if (error) newErrors[field] = error;
     });
     setErrors(newErrors);
-    return Object.keys(newErrors).length === 0; // Retorna true se não houver erros
+    return Object.keys(newErrors).length === 0;
   };
 
   return { values, errors, handleChange, validate, updateValues: setValues };
