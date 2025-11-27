@@ -1,8 +1,14 @@
-import React, { JSX, useEffect, useState } from 'react';
+import {
+  createUser,
+  fetchUserById,
+  updateUser,
+  UserRole,
+  UserVM,
+} from 'bff/userBff';
+import { useAsyncResource } from 'hooks/useAsyncResource';
+import React, { JSX, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import Snackbar from 'shared/feedback/Snackbar';
-import { useIsMounted } from 'hooks/useIsMounted';
-import api from 'http/api';
 import FormField from 'shared/ui/FormField';
 import PrimaryButton from 'shared/ui/PrimaryButton';
 import SecondaryButton from 'shared/ui/SecondaryButton';
@@ -22,52 +28,39 @@ interface UserFormProps {
 }
 
 function UserForm({ isEditing = false }: UserFormProps): JSX.Element {
-  const [name, setName] = useState<string>('');
-  const [email, setEmail] = useState<string>('');
-  const [password, setPassword] = useState<string>('');
   const [snackbar, setSnackbar] = useState<SnackbarState>({
     message: '',
     type: 'success',
     duration: 0,
   });
-  const [loadingUser, setLoadingUser] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
   const navigate = useNavigate();
-  const isMounted = useIsMounted();
   const { id } = useParams<UserFormParams>();
 
-  useEffect(() => {
-    if (isEditing && id && isMounted()) {
-      const fetchUser = async () => {
-        try {
-          setLoadingUser(true);
-          const response = await api.get<{ nome: string; email: string }>(
-            `/users/${id}`,
-          );
-          const { nome, email: fetchedEmail } = response.data;
-          setName(nome);
-          setEmail(fetchedEmail);
-        } catch {
-          setSnackbar({
-            message: 'Erro ao carregar os dados do usuário',
-            type: 'error',
-            duration: 10000,
-          });
-        } finally {
-          setLoadingUser(false);
-        }
-      };
-
-      fetchUser();
-    }
-  }, [id, isEditing, isMounted]);
+  const {
+    data: user,
+    setData: setUser,
+    loading,
+  } = useAsyncResource<UserVM | null>(
+    async () => {
+      if (!id) return null;
+      return await fetchUserById(id);
+    },
+    {
+      initialData: null,
+    },
+  );
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     // Validações bem simples (se quiser podemos plugar useForm depois)
-    if (!name.trim() || !email.trim() || (!isEditing && !password.trim())) {
+    if (
+      !user?.nome.trim() ||
+      !user?.email.trim() ||
+      (!isEditing && !user?.password?.trim())
+    ) {
       setSnackbar({
         message: 'Preencha todos os campos obrigatórios.',
         type: 'warning',
@@ -79,26 +72,31 @@ function UserForm({ isEditing = false }: UserFormProps): JSX.Element {
     try {
       setSubmitting(true);
 
-      const url = isEditing ? `/users/${id}` : '/users';
-      const method = isEditing ? 'put' : 'post';
+      const { nome: name, email, password } = user || {};
+      const method = isEditing
+        ? updateUser(id!, {
+            nome: name,
+            email,
+            senha: password || undefined,
+          })
+        : createUser({
+            nome: name,
+            email,
+            senha: password!,
+            role: UserRole.CLIENTE,
+          });
 
-      const response = await api[method](url, {
-        nome: name,
-        email,
-        senha: password || undefined,
+      await method;
+
+      setSnackbar({
+        message: isEditing
+          ? 'Usuário atualizado com sucesso'
+          : 'Usuário criado com sucesso',
+        type: 'success',
+        duration: 6000,
       });
 
-      if (response.status >= 200 && response.status < 300) {
-        setSnackbar({
-          message: isEditing
-            ? 'Usuário atualizado com sucesso'
-            : 'Usuário criado com sucesso',
-          type: 'success',
-          duration: 6000,
-        });
-
-        navigate('/admin/usuarios');
-      }
+      navigate('/admin/usuarios');
     } catch (error: unknown) {
       const axiosError = error as {
         response?: { data?: { message?: string } };
@@ -123,7 +121,7 @@ function UserForm({ isEditing = false }: UserFormProps): JSX.Element {
           {isEditing ? 'Editar usuário' : 'Criar usuário'}
         </h2>
 
-        {loadingUser && isEditing && (
+        {loading && isEditing && (
           <p className="text-xs text-slate-500">
             Carregando dados do usuário...
           </p>
@@ -133,16 +131,16 @@ function UserForm({ isEditing = false }: UserFormProps): JSX.Element {
           label="Nome"
           type="text"
           placeholder="Digite o nome do usuário"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
+          value={user?.nome || ''}
+          onChange={(e) => setUser({ ...user!, nome: e.target.value })}
         />
 
         <FormField
           label="E-mail"
           type="email"
           placeholder="Digite o e-mail do usuário"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          value={user?.email || ''}
+          onChange={(e) => setUser({ ...user!, email: e.target.value })}
         />
 
         {!isEditing && (
@@ -150,8 +148,8 @@ function UserForm({ isEditing = false }: UserFormProps): JSX.Element {
             label="Senha"
             type="password"
             placeholder="Crie uma senha para o usuário"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            value={user?.password || ''}
+            onChange={(e) => setUser({ ...user!, password: e.target.value })}
           />
         )}
 
@@ -170,7 +168,7 @@ function UserForm({ isEditing = false }: UserFormProps): JSX.Element {
             type="submit"
             fullWidth
             className="sm:w-auto"
-            disabled={submitting || (loadingUser && isEditing)}
+            disabled={submitting || (loading && isEditing)}
           >
             {submitting
               ? isEditing

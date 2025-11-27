@@ -1,12 +1,13 @@
 // src/bff/pratoBff.ts
+import { Prato } from 'domain/prato';
 import api from 'http/api';
-import {Prato} from 'domain/prato';
 
 export interface PratoClienteVM {
   id: number;
   nome: string;
   cozinha: string;
   descricaoCurta: string;
+  descricaoDetalhada: string;
   imagemUrl: string;
   valor: number;
   precoFormatado: string;
@@ -18,6 +19,7 @@ function mapPratoToClienteVM(prato: Prato): PratoClienteVM {
     nome: prato.nome,
     cozinha: prato.cozinha,
     descricaoCurta: prato.descricao_resumida,
+    descricaoDetalhada: prato.descricao_detalhada,
     imagemUrl: prato.imagem,
     valor: prato.valor,
     precoFormatado: prato.valor.toLocaleString('pt-BR', {

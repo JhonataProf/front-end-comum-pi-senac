@@ -15,7 +15,8 @@ import useSnackbar from 'hooks/useSnackbar';
 const ShoppingCart: React.FC = () => {
   const navigate = useNavigate();
 
-  const { pratos, adicionarPrato, removerPrato, totalCompra } = useCart();
+  const { pratos, adicionarPrato, removerPrato, totalCompra, clearCart } =
+    useCart();
 
   const [address, setAddress] = useState<string>('');
   const [paymentInfo, setPaymentInfo] = useState<string>('');
@@ -167,14 +168,28 @@ const ShoppingCart: React.FC = () => {
               </span>
             </div>
 
-            <PrimaryButton
-              type="button"
-              onClick={handleConfirmOrder}
-              fullWidth
-              className="mt-4"
-            >
-              Confirmar pedido
-            </PrimaryButton>
+            <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:justify-between">
+              <SecondaryButton
+                type="button"
+                onClick={clearCart}
+                disabled={!pratos.length}
+              >
+                Esvaziar carrinho
+              </SecondaryButton>
+
+              <PrimaryButton
+                type="button"
+                onClick={handleConfirmOrder}
+                fullWidth
+              >
+                Confirmar pedido (
+                {totalCompra.toLocaleString('pt-BR', {
+                  style: 'currency',
+                  currency: 'BRL',
+                })}
+                )
+              </PrimaryButton>
+            </div>
 
             {/* Botão voltar (mobile) */}
             <SecondaryButton

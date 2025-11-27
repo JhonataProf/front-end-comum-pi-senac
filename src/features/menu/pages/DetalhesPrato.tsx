@@ -1,26 +1,16 @@
+import useCart from 'hooks/useCart';
 import React from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import useCart from 'hooks/useCart';
 
 import { PratoCarrinho } from 'context/cartContext';
 import { useAsyncResource } from 'hooks/useAsyncResource';
 import useSnackbar from 'hooks/useSnackbar';
 
-import api from 'http/api';
-
-import PageLayout from 'shared/layout/PageLayout';
+import { fetchPratoClienteById, PratoClienteVM } from 'bff/pratoBff';
 import Snackbar from 'shared/feedback/Snackbar';
+import PageLayout from 'shared/layout/PageLayout';
 import PrimaryButton from 'shared/ui/PrimaryButton';
 import SecondaryButton from 'shared/ui/SecondaryButton';
-
-interface Prato {
-  id: number;
-  nome: string;
-  cozinha: string;
-  descricaoDetalhada: string;
-  imagem: string;
-  valor: number;
-}
 
 const DetalhesPrato: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -35,11 +25,10 @@ const DetalhesPrato: React.FC = () => {
     data: prato,
     loading,
     error,
-  } = useAsyncResource<Prato | null>(
+  } = useAsyncResource<PratoClienteVM | null>(
     async () => {
       if (!id) return null;
-      const response = await api.get<Prato>(`/pratos/${id}`);
-      return response.data;
+      return fetchPratoClienteById(id);
     },
     {
       initialData: null,
@@ -57,7 +46,7 @@ const DetalhesPrato: React.FC = () => {
       let pratoParaAdicionar: PratoCarrinho;
 
       if (pratoExistente) {
-        pratoExistente.quantidade += 1;
+        pratoExistente.quantidade += quantidade;
         quantidade = pratoExistente.quantidade;
         pratoParaAdicionar = pratoExistente;
       } else {
@@ -110,7 +99,7 @@ const DetalhesPrato: React.FC = () => {
             {/* Imagem + infos principais */}
             <div className="flex flex-col md:flex-row">
               <img
-                src={prato.imagem}
+                src={prato.imagemUrl}
                 alt={`Imagem de ${prato.nome}`}
                 className="h-56 w-full object-cover md:h-auto md:w-1/2"
                 loading="lazy"
@@ -127,10 +116,7 @@ const DetalhesPrato: React.FC = () => {
                 </p>
 
                 <p className="mt-3 text-sm font-semibold text-emerald-700 sm:text-base">
-                  {prato.valor.toLocaleString('pt-BR', {
-                    style: 'currency',
-                    currency: 'BRL',
-                  })}
+                  {prato.precoFormatado}
                 </p>
               </div>
             </div>

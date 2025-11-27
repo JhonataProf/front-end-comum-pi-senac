@@ -7,18 +7,10 @@ import TabelaJS from 'shared/table/TabelaJS';
 import EmptyState from 'shared/ui/EmptyState';
 import PrimaryButton from 'shared/ui/PrimaryButton';
 
+import { deleteUserById, fetchUsers, UserVM } from 'bff/userBff';
 import { useAsyncResource } from 'hooks/useAsyncResource';
 import useSnackbar from 'hooks/useSnackbar';
 import useTable from 'hooks/useTable';
-
-import api from 'http/api';
-
-interface User {
-  id: number;
-  nome: string;
-  email: string;
-  role: string;
-}
 
 const UserManagementInner: React.FC = () => {
   const navigate = useNavigate();
@@ -33,16 +25,10 @@ const UserManagementInner: React.FC = () => {
     loading,
     error,
     refetch,
-  } = useAsyncResource<User[]>(
-    async () => {
-      const response = await api.get<User[]>('/users/');
-      return response.data;
-    },
-    { initialData: [] },
-  );
+  } = useAsyncResource<UserVM[]>(fetchUsers, { initialData: [] });
 
   // Busca / filtro na tabela
-  const { filteredData, searchTerm, handleSearch } = useTable<User>(
+  const { filteredData, searchTerm, handleSearch } = useTable<UserVM>(
     users || [],
     (user, term) => {
       const search = term.toLowerCase();
@@ -61,14 +47,13 @@ const UserManagementInner: React.FC = () => {
     }
   }, [error, showError]);
 
-  const handleEdit = (user: User) => {
+  const handleEdit = (user: UserVM) => {
     navigate(`/admin/usuarios/editar/${user.id}`);
   };
 
-  const handleDelete = async (user: User) => {
+  const handleDelete = async (user: UserVM) => {
     try {
-      const response = await api.delete(`/users/${user.id}`);
-      console.log('Usuário deletado com sucesso:', response.data);
+      await deleteUserById(user.id);
 
       setUsers((prev) => (prev || []).filter((u) => u.id !== user.id));
       showSuccess('Usuário removido com sucesso.');
@@ -78,11 +63,16 @@ const UserManagementInner: React.FC = () => {
     }
   };
 
-  const handleView = (user: User) => {
+  const handleView = (user: UserVM) => {
     navigate(`/admin/usuarios/editar/${user.id}`);
   };
 
-  const columns: (keyof User | 'Ações')[] = ['nome', 'email', 'role', 'Ações'];
+  const columns: (keyof UserVM | 'Ações')[] = [
+    'nome',
+    'email',
+    'role',
+    'Ações',
+  ];
 
   return (
     <>
