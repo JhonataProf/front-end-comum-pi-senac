@@ -1,6 +1,6 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { FiUser } from 'react-icons/fi';
 import { AuthContext } from 'context/authContext';
+import React, { useEffect, useRef, useState } from 'react';
+import { FiUser } from 'react-icons/fi';
 import { Link } from 'react-router-dom';
 
 interface UserMenuLinkOption {
@@ -40,8 +40,8 @@ const UserMenu: React.FC<UserMenuProps> = ({ options }) => {
   }, []);
 
   const defaultOptions: UserMenuOption[] = [
-    { label: 'Meus Dados', to: '/user/details' },
-    { label: 'Sair', to: '/logout' },
+    { label: 'Meus Dados', to: '/usuario/detalhes' },
+    { label: 'Sair', to: '/admin/logout' },
   ];
 
   const menuOptions = options || defaultOptions;

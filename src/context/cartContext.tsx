@@ -1,5 +1,11 @@
 // src/context/cartContext.tsx
-import React, { createContext, ReactNode, useCallback, useEffect, useState } from 'react';
+import React, {
+  createContext,
+  ReactNode,
+  useCallback,
+  useEffect,
+  useState,
+} from 'react';
 
 export interface PratoCarrinho {
   id: number;
@@ -81,6 +87,18 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
 
   const totalCompra =
     pratos.reduce((sum, dish) => sum + dish.valor * dish.quantidade, 0) || 0;
+
+  useEffect(() => {
+    try {
+      if (pratos) {
+        localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(pratos));
+      } else {
+        localStorage.removeItem(CART_STORAGE_KEY);
+      }
+    } catch {
+      // ignore
+    }
+  }, [pratos]);
 
   return (
     <CartContext.Provider

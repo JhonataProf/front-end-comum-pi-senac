@@ -1,6 +1,9 @@
 // src/serviceWorkerRegistration.ts
 export function register() {
-  if ('serviceWorker' in navigator) {
+  if (
+    process.env.REACT_APP_NODE_ENV === 'production' &&
+    'serviceWorker' in navigator
+  ) {
     window.addEventListener('load', () => {
       navigator.serviceWorker
         .register('/service-worker.js')

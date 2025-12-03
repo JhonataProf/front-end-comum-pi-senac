@@ -2,22 +2,22 @@
 import React from 'react';
 import { Navigate } from 'react-router-dom';
 
-
-import PublicLayout from 'shared/layout/PublicLayout';
 import RestrictedLayout from 'features/admin/layout/RestrictedLayout';
+import PublicLayout from 'shared/layout/PublicLayout';
 
-import HomeCliente from 'features/menu/pages/HomeCliente';
-import DetalhesPrato from 'features/menu/pages/DetalhesPrato';
 import ShoppingCart from 'features/cart/pages/ShoppingCart';
+import DetalhesPrato from 'features/menu/pages/DetalhesPrato';
+import HomeCliente from 'features/menu/pages/HomeCliente';
 
-import AdminLoginPage from 'features/auth/pages/AdminLoginPage';
 import UserForm from 'features/admin/components/UserForm';
-import ClientLoginPage from 'features/auth/pages/ClienteLoginPage';
-import ProtectedRoute from 'shared/routing/ProtectedRoute';
 import Home from 'features/admin/pages/AdminHomePage';
+import OrderManagementPage from 'features/admin/pages/OrderManagementPage';
 import FormularioPrato from 'features/admin/pages/PratoFormPage';
 import UserManagementPage from 'features/admin/pages/UserManagementPage';
-import OrderManagementPage from 'features/admin/pages/OrderManagementPage';
+import AdminLoginPage from 'features/auth/pages/AdminLoginPage';
+import ClientLoginPage from 'features/auth/pages/ClienteLoginPage';
+import LogoutPage from 'features/auth/pages/LogoutPage';
+import ProtectedRoute from 'shared/routing/ProtectedRoute';
 
 export interface RouteConfig {
   path: string;
@@ -37,9 +37,7 @@ const routes: RouteConfig[] = [
   // rotas públicas com PublicLayout
   {
     path: '',
-    element: (
-      <PublicLayout />
-    ),
+    element: <PublicLayout />,
     children: [
       {
         path: '',
@@ -97,6 +95,10 @@ const routes: RouteConfig[] = [
             element: <OrderManagementPage />,
           },
         ],
+      },
+      {
+        path: 'logout',
+        element: <LogoutPage />,
       },
     ],
   },

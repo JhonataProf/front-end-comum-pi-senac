@@ -1,7 +1,8 @@
 // src/ProtectedRoute.tsx
+import useAuth from 'features/auth/hooks/useAuth';
+import useAuthInfo from 'features/auth/hooks/useAuthInfo';
 import React from 'react';
 import { Navigate, Outlet } from 'react-router-dom';
-import useAuthInfo from 'features/auth/hooks/useAuthInfo';
 
 const ProtectedRoute: React.FC = () => {
   const { isAuthenticated, canAccessAdmin } = useAuthInfo();
@@ -13,6 +14,8 @@ const ProtectedRoute: React.FC = () => {
 
   // Logado, mas não tem permissão de admin (CLIENTE) → manda para a home pública
   if (!canAccessAdmin) {
+    const { logout } = useAuth();
+    logout();
     return <Navigate to="/" replace />;
   }
 

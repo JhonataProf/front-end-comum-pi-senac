@@ -10,13 +10,15 @@ export function useCart() {
 
   const { pratos, adicionarPrato, removerPrato, clearCart, totalCompra } = ctx;
 
+  const itens = pratos || [];
+
   const totalItens = useMemo(
-    () => pratos.reduce((acc, p) => acc + p.quantidade, 0),
+    () => itens.reduce((acc, p) => acc + p.quantidade, 0),
     [pratos],
   );
 
   return {
-    pratos,
+    pratos: itens,
     adicionarPrato,
     removerPrato,
     clearCart,

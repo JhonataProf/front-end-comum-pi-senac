@@ -1,3 +1,4 @@
+import { AuthContext } from 'context/authContext';
 import React, { useContext, useState } from 'react';
 import {
   FiDisc,
@@ -8,9 +9,8 @@ import {
   FiUsers,
 } from 'react-icons/fi';
 import { NavLink, Outlet } from 'react-router-dom';
-import { AuthContext } from 'context/authContext';
-import UserMenu from 'shared/ui/UserMenu';
 import CartIconButton from 'shared/ui/CartIconButton';
+import UserMenu from 'shared/ui/UserMenu';
 
 export interface MenuItem {
   path: string;
@@ -50,7 +50,7 @@ const RestrictedLayout: React.FC = () => {
       >
         <div className="flex items-center justify-between border-b border-slate-800 px-4 py-3">
           <span className="text-sm font-semibold tracking-tight">
-            Meu Sistema
+            Cardápio Eletrônico Restaurante Terra das Águas
           </span>
           <button
             type="button"

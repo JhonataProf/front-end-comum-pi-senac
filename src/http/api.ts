@@ -149,9 +149,13 @@ api.interceptors.response.use(
 
       if (newToken) {
         if (isApiDebug) {
-          console.log('[API][response][401]', 'Refresh OK, refazendo request...', {
-            url: originalRequest.url,
-          });
+          console.log(
+            '[API][response][401]',
+            'Refresh OK, refazendo request...',
+            {
+              url: originalRequest.url,
+            },
+          );
         }
 
         originalRequest.headers = originalRequest.headers ?? {};
@@ -160,10 +164,14 @@ api.interceptors.response.use(
         const retryResponse = await api(originalRequest);
 
         if (isApiDebug) {
-          console.log('[API][response][401]', 'Request reexecutado com sucesso.', {
-            url: originalRequest.url,
-            status: retryResponse.status,
-          });
+          console.log(
+            '[API][response][401]',
+            'Request reexecutado com sucesso.',
+            {
+              url: originalRequest.url,
+              status: retryResponse.status,
+            },
+          );
           console.groupEnd();
         }
 
